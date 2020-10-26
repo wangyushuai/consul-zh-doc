@@ -5,6 +5,6 @@
   * [反熵](consul-architecture/consul-by-hashicorp.md)
   * [共识协议](consul-architecture/consul-by-hashicorp-1.md)
   * [Gossip协议](consul-architecture/consul-by-hashicorp-2.md)
-  * [Consul by HashiCorp](consul-architecture/consul-by-hashicorp-4.md)
-  * [Jepsen测试](consul-architecture/consul-by-hashicorp-3.md)
+  * [Japsen测试](consul-architecture/consul-by-hashicorp-4.md)
+  * [网络候选人](consul-architecture/consul-by-hashicorp-3.md)
 
