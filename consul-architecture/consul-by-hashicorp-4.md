@@ -1,4 +1,4 @@
-# Japsen测试
+# Consul by HashiCorp
 
 [Jepsen](http://aphyr.com/posts/281-call-me-maybe-carly-rae-jepsen-and-the-perils-of-network-partitions) is a tool, written by Kyle Kingsbury, designed to test the partition tolerance of distributed systems. It creates network partitions while fuzzing the system with random operations. The results are analyzed to see if the system violates any of the consistency properties it claims to have.
 
