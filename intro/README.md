@@ -9,7 +9,7 @@
 * **服务发现** : Consul的客户端可以注册一个服务，比如api或mysql，其他客户端可以使用Consul来发现特定服务的提供者。使用DNS或HTTP，应用程序可以很容易地找到他们所依赖的服务。
 *  **健康检查** : Consul客户端可以提供任何数量的健康检查，要么与给定的服务相关联（如： "webserver是否返回200 OK"），要么与本地节点相关联（如： "内存利用率是否低于90%"）。这些信息可以运维人员用来**监控集群的健康状况**，并被服务发现组件来路由流量（比如： 仅路由到健康节点）
 *  **KV存储** ： 应用程序可以利用Consul的**层级K/V**存储来实现任何目的，包括动态配置、功能标记、协调、领导者选举等。Consul提供了HTTP API，使其非常简单以用。
-*  **安全服务通信**： ****Consul可以为服务生成和分发TLS（ [传输层安全性协议](https://baike.baidu.com/item/TLS)）证书，以建立相互的TLS连接。可以使用[Intentio](https://www.consul.io/docs/connect/intentions)来定义哪些服务被允许进行通信。服务隔离可以通过可以实时更改[Intention](https://www.consul.io/docs/connect/intentions)策略轻松管理，而不是使用复杂的网络拓扑结构和静态防火墙规则。 
+*  **安全服务通信**： ****Consul可以为服务生成和分发TLS（ [传输层安全性协议](https://baike.baidu.com/item/TLS)）证书，以建立相互的TLS连接。可以使用[Intention](https://www.consul.io/docs/connect/intentions)来定义哪些服务被允许进行通信。服务隔离可以通过可以实时更改[Intention](https://www.consul.io/docs/connect/intentions)策略轻松管理，而不是使用复杂的网络拓扑结构和静态防火墙规则。 
 * **多数据中心**: ****Consul支持开箱即用的**多数据中心**。这意味着Consul的用户不必担心建立额外的抽象层来发展到多个区域。 
 
 Consul的设计对DevOps社区和应用开发人员都很友好，使其成为现代弹性基础架构的完美选择。
