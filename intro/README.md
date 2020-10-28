@@ -4,6 +4,12 @@
 
 ## 什么是Consul
 
+Consul是一个**服务网格**解决方案，提供了一个功能齐全的控制平面，具有服务发现、配置和分段功能。这些功能中的每一项都可以根据需要单独使用，也可以一起使用来构建一个完整的服务网格。Consul需要一个数据平面，并支持代理和原生集成模型。Consul提供了一个简单的内置代理，因此一切都可以开箱即用，但也支持第三方代理集成，如Envoy。 回顾下面的视频，向HashiCorp的联合创始人Armon了解更多关于Consul的信息。
+
+请点击此链接查看视频：  [Consul介绍视频](https://www.youtube.com/watch?v=mxeMdl0KvBI)
+
+![Consul&#x4ECB;&#x7ECD;&#x89C6;&#x9891;](../.gitbook/assets/image.png)
+
  Consul的主要功能有:
 
 * **服务发现** : Consul的客户端可以注册一个服务，比如api或mysql，其他客户端可以使用Consul来发现特定服务的提供者。使用DNS或HTTP，应用程序可以很容易地找到他们所依赖的服务。
