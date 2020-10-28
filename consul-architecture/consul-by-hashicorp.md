@@ -1,4 +1,4 @@
-# 反熵
+# 共识协议
 
 Consul uses a [consensus protocol](https://en.wikipedia.org/wiki/Consensus_%28computer_science%29) to provide [Consistency \(as defined by CAP\)](https://en.wikipedia.org/wiki/CAP_theorem). The consensus protocol is based on ["Raft: In search of an Understandable Consensus Algorithm"](https://raft.github.io/raft.pdf). For a visual explanation of Raft, see [The Secret Lives of Data](http://thesecretlivesofdata.com/raft).
 

@@ -1,58 +1,60 @@
-# 共识协议
+# 反熵
 
-Consul uses an advanced method of maintaining service and health information. This page details how services and checks are registered, how the catalog is populated, and how health status information is updated as it changes.
+Consul使用了先进的方法来维护**服务**和**健康**信息。 本篇文章的将详细介绍下**服务**和**服务检查**是如何被注册地，**Catalog**又是如何被填充地，以及当服务健康状况变化是，服务健康信息是如何更新地。
 
-## [»](consul-by-hashicorp-1.md#components)Components
+## »Components（组件）
 
-It is important to first understand the moving pieces involved in services and health checks: the [agent](consul-by-hashicorp-1.md#agent) and the [catalog](consul-by-hashicorp-1.md#catalog). These are described conceptually below to make anti-entropy easier to understand.
+首先，了解下**服务**和**健康检查**涵盖的两个比较重要的概念： **Agent\(代理\)**和**Catalog（服务目录）**; 接下来描述的也将使反熵更容易理解。
 
-### [»](consul-by-hashicorp-1.md#agent)Agent
+## »Agent（代理）
 
-Each Consul agent maintains its own set of service and check registrations as well as health information. The agents are responsible for executing their own health checks and updating their local state.
+每个Consul代理（Agent） 都有自己的一套**服务\(services\)** 和 **检查\(checks\)** 的注册信息，以及**健康状况\(status\)**信息。代理负责执行健康检查以及更新本地状态。
 
-Services and checks within the context of an agent have a rich set of configuration options available. This is because the agent is responsible for generating information about its services and their health through the use of [health checks](https://www.consul.io/docs/agent/checks).
+代理上下文中的**服务**和**检查**有丰富的配置选项可用。 这是因为代理负责通过使用运行状况检查生成有关其服务及其运行状况的信息。
 
-### [»](consul-by-hashicorp-1.md#catalog)Catalog
+## »Catalog（目录）
 
-Consul's service discovery is backed by a service catalog. This catalog is formed by aggregating information submitted by the agents. The catalog maintains the high-level view of the cluster, including which services are available, which nodes run those services, health information, and more. The catalog is used to expose this information via the various interfaces Consul provides, including DNS and HTTP.
+Consul的服务发现是由**服务目录**\(Catalog\)支持的。此目录是通过聚合**代理\(Agent\)**提交的信息而形成的。目录维护集群的高级视图，包括哪些服务可用、哪些节点运行这些服务、运行状况信息等等。目录用来暴露这些信息， 通过consul提供的各种接口（包括DNS和HTTP）。
 
-Services and checks within the context of the catalog have a much more limited set of fields when compared with the agent. This is because the catalog is only responsible for recording and returning information _about_ services, nodes, and health.
+与代理相比，目录上下文中的服务和检查的字段集要有限得多。这是因为目录只负责记录和返回有关**服务、节点和运行状况**的信息.
 
-The catalog is maintained only by server nodes. This is because the catalog is replicated via the [Raft log](https://www.consul.io/docs/internals/consensus) to provide a consolidated and consistent view of the cluster.
+## »Anti-Entropy（反熵）
 
-## [»](consul-by-hashicorp-1.md#anti-entropy-1)Anti-Entropy
+![Consul&#x53CD;&#x71B5;&#x6A21;&#x578B;](https://img-blog.csdnimg.cn/20200913210708340.png?x-oss-process=image/watermark,type_ZmFuZ3poZW5naGVpdGk,shadow_10,text_aHR0cHM6Ly9ibG9nLmNzZG4ubmV0L3NodWFpX3d5,size_16,color_FFFFFF,t_70#pic_center)
 
-Entropy is the tendency of systems to become increasingly disordered. Consul's anti-entropy mechanisms are designed to counter this tendency, to keep the state of the cluster ordered even through failures of its components.
+熵是系统变得越来越无序的趋势。Consul的反熵机制旨在对抗这种趋势，即使在组件发生故障的情况下也能保持集群的有序状态。
 
-Consul has a clear separation between the global service catalog and the agent's local state as discussed above. The anti-entropy mechanism reconciles these two views of the world: anti-entropy is a synchronization of the local agent state and the catalog. For example, when a user registers a new service or check with the agent, the agent in turn notifies the catalog that this new check exists. Similarly, when a check is deleted from the agent, it is consequently removed from the catalog as well.
+如上文所述，Consul在全局服务目录和代理的本地状态之间有明确的分隔。反熵机制协调了这两种世界观：反熵是本地代理状态和目录的同步。例如，当用户向代理注册新服务或检查时，代理又通知目录此新检查存在。类似地，当从代理中删除检查时，它也会从目录中删除。
 
-Anti-entropy is also used to update availability information. As agents run their health checks, their status may change in which case their new status is synced to the catalog. Using this information, the catalog can respond intelligently to queries about its nodes and services based on their availability.
+反熵还用于更新可用性信息。当代理运行健康检查时，节点和服务的状态可能会更改，在这种情况下，新的新状态将同步到**目录**。使用这些信息，目录可以根据节点和服务的可用性返回他们的最新的状态。
 
-During this synchronization, the catalog is also checked for correctness. If any services or checks exist in the catalog that the agent is not aware of, they will be automatically removed to make the catalog reflect the proper set of services and health information for that agent. Consul treats the state of the agent as authoritative; if there are any differences between the agent and catalog view, the agent-local view will always be used.
+在此同步过程中，**目录**还将检查目录的正确性。如果目录中存在代理没有的任何服务或检查，它们将自动从目录中删除，以使目录正确地反映该代理的服务和运行状况。Consul数将代理的状态视为权威；如果**代理**和**目录**视图之间存在任何差异，则始终使用代理本地视图。
 
-## [»](consul-by-hashicorp-1.md#periodic-synchronization)Periodic Synchronization
+## »Periodic Synchronization（周期性同步）
 
-In addition to running when changes to the agent occur, anti-entropy is also a long-running process which periodically wakes up to sync service and check status to the catalog. This ensures that the catalog closely matches the agent's true state. This also allows Consul to re-populate the service catalog even in the case of complete data loss.
+除了在代理发生更改时运行之外，反熵也是一个长期运行的进程，它定期唤醒以同步服务和检查状态到目录。这样可以确保目录与代理的真实状态紧密匹配。这也允许Consul在完全数据丢失的情况下重新填充**服务目录**。
 
-To avoid saturation, the amount of time between periodic anti-entropy runs will vary based on cluster size. The table below defines the relationship between cluster size and sync interval:
+为了避免饱和，周期性反熵运行之间的时间量将根据集群大小而变化。下表定义了群集大小与同步间隔之间的关系：（PS: 数量其实是 Agent 数量）
 
-| Cluster Size | Periodic Sync Interval |
+| 集群大小 | 周期性同步间隔 |
 | :--- | :--- |
-| 1 - 128 | 1 minute |
-| 129 - 256 | 2 minutes |
-| 257 - 512 | 3 minutes |
-| 513 - 1024 | 4 minutes |
-| ... | ... |
+| 1-128 | 1分钟 |
+| 129-256 | 2分钟 |
+| 257-512 | 3分钟 |
+| 513-1024 | 4分钟 |
+| ... |  |
 
-The intervals above are approximate. Each Consul agent will choose a randomly staggered start time within the interval window to avoid a thundering herd.
+上面的间隔是近似的。每一个Consul 代理都会在间隔时间内随机选择一个交错的开始时间，以避免都挤到一起。
 
-## [»](consul-by-hashicorp-1.md#best-effort-sync)Best-effort sync
+## »Best-effort sync （最大努力同步）
 
-Anti-entropy can fail in a number of cases, including misconfiguration of the agent or its operating environment, I/O problems \(full disk, filesystem permission, etc.\), networking problems \(agent cannot communicate with server\), among others. Because of this, the agent attempts to sync in best-effort fashion.
+反熵在许多情况下都可能失败，包括代理或其操作环境的错误配置、I/O问题（完整磁盘、文件系统权限等）、网络问题（代理无法与服务器通信）等等。因此，代理尝试以最大努力的方式进行同步。
 
-If an error is encountered during an anti-entropy run, the error is logged and the agent continues to run. The anti-entropy mechanism is run periodically to automatically recover from these types of transient failures.
+如果在反熵运行期间遇到错误，将记录该错误并继续运行代理。反熵机制定期运行，以自动从这些类型的瞬态故障中恢复。
 
-## [»](consul-by-hashicorp-1.md#enable-tag-override)Enable Tag Override
+PS: 我理解的意思是说， 如果遇到错误，将继续运行代理。 下个周期可能将自动恢复。
 
-Synchronization of service registration can be partially modified to allow external agents to change the tags for a service. This can be useful in situations where an external monitoring service needs to be the source of truth for tag information. For example, the Redis database and its monitoring service Redis Sentinel have this kind of relationship. Redis instances are responsible for much of their configuration, but Sentinels determine whether the Redis instance is a primary or a secondary. Using the Consul service configuration item [enable\_tag\_override](https://www.consul.io/docs/agent/services) you can instruct the Consul agent on which the Redis database is running to NOT update the tags during anti-entropy synchronization. For more information see [Services](https://www.consul.io/docs/agent/services#enable-tag-override-and-anti-entropy) page.
+## »Enable Tag Override\(启动标签覆盖\)
+
+可以部分修改服务注册的同步，以允许外部代理更改服务的标记。这在外部监视服务需要作为标记信息的真实来源的情况下非常有用。比如Redis数据库和它的监控服务Redis Sentinel就有这种关系。Redis实例负责其大部分配置，但是sentinel决定Redis实例是主实例还是辅助实例。使用Consul服务配置项enable\_tag\_override，可以指示运行Redis数据库的consul代理在反熵同步期间不更新标记。有关更多信息，请参阅服务页。
 
