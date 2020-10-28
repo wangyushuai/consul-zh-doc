@@ -24,7 +24,7 @@ _PS: 为了方便大家阅读，我这里补充一下， Consul Agent 分为两�
 
 Agent与一个或多个Consul Server对话。Consul Server是**存储**和**复制数据**的地方。Server本身会选出一个Leader。虽然Consul可以用一台Server来运作，但建议使用3到5台，以避免故障情况导致数据丢失。建议每个数据中心采用Consul服务器集群。
 
-Server Agent维护着一个目录（Catalog），这个目录（Catalog）是由Agent提交的信息汇总形成的。目录维护着集群的高层视图，包括哪些服务可用，哪些节点运行这些服务，健康信息等。关于代理和目录如何交互，可以在[这里](https://blog.csdn.net/shuai_wy/article/details/108350348)找到。 
+Server Agent维护着一个目录（Catalog），这个目录（Catalog）是由Agent提交的信息汇总形成的。目录维护着集群的高层视图，包括哪些服务可用，哪些节点运行这些服务，健康信息等。关于代理和目录如何交互，可以在[这里](https://yushuai-w.gitbook.io/consul/architecture/anti-entropy)找到。 
 
 需要发现其他服务或节点的基础结构组件可以查询任何Consul Server或任何Consul Agent。Agent将查询自动转发到Server。
 
