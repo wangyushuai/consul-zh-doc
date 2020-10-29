@@ -1,9 +1,5 @@
 # Consul介绍
 
-
-
-
-
 欢迎来到Consul的入门指南! 本指南是开始使用Consul的最佳地方。我们涵盖了Consul是什么，它能解决什么问题，它与现有软件的比较，以及你如何开始使用它。如果你熟悉Consul的基础知识，这个[文档](https://www.consul.io/docs)提供了更详细的可用功能参考。
 
 ## 什么是Consul
