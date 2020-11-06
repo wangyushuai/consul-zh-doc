@@ -1,14 +1,16 @@
 # ACL系统
 
-**1.4.0 and later:** This guide only applies in Consul versions 1.4.0 and later. The documentation for the legacy ACL system is [here](https://www.consul.io/docs/acl/acl-legacy).
+1.4.0及以后的版本。本指南只适用于Consul 1.4.0及以后的版本。旧版ACL系统的文档在[这里](https://www.consul.io/docs/acl/acl-legacy)。
 
-Consul provides an optional Access Control List \(ACL\) system which can be used to control access to data and APIs. The ACL is [Capability-based](https://en.wikipedia.org/wiki/Capability-based_security), relying on tokens which are associated with policies to determine which fine grained rules can be applied. Consul's capability based ACL system is very similar to the design of [AWS IAM](https://aws.amazon.com/iam/).
+Consul提供了一个可选的访问控制列表（ACL）系统，可用于控制对数据和API的访问。ACL是[基于能力的](https://en.wikipedia.org/wiki/Capability-based_security)\(_系统的安全模型之一_\)，依靠与策略相关联的令牌来确定可以应用哪些细粒度的规则。Consul的基于能力的ACL系统与[AWS IAM](https://aws.amazon.com/iam/)的设计非常相似。
 
 To learn how to setup the ACL system on an existing Consul datacenter, use the [Bootstrapping The ACL System tutorial](https://learn.hashicorp.com/tutorials/consul/access-control-setup?utm_source=consul.io&utm_medium=docs).
 
-## [»](acl-system.md#acl-system-overview)ACL System Overview
+要学习如何在现有的Consul数据中心上设置ACL系统，请使用[Bootstrapping The ACL系统教程](https://learn.hashicorp.com/tutorials/consul/access-control-setup?utm_source=consul.io&utm_medium=docs)。
 
-The ACL system is designed to be easy to use and fast to enforce while providing administrative insight. At the highest level, there are two major components to the ACL system:
+## [»](acl-system.md#acl-system-overview)ACL系统概览
+
+ACL系统的设计是为了便于使用和快速执行，同时提供管理方面的见解。宏观来看，ACL系统有两个主要组成部分：
 
 * **ACL Policies** - Policies allow the grouping of a set of rules into a logical unit that can be reused and linked with many tokens.
 * **ACL Tokens** - Requests to Consul are authorized by using bearer token. Each ACL token has a public Accessor ID which is used to name a token, and a Secret ID which is used as the bearer token used to make requests to Consul.
