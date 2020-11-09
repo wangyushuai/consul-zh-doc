@@ -2,21 +2,13 @@
 
 1.4.0及更高版本：本指南仅适用于Consul 1.4.0及更高版本。 旧版ACL系统的文档在[这里](https://www.consul.io/docs/acl/acl-legacy)。
 
-1.4.0及以后的版本。本指南只适用于Consul 1.4.0及以后的版本。旧版ACL系统的文档在[这里](https://www.consul.io/docs/acl/acl-legacy)。
-
- Consul提供了可选的访问控制列表（ACL）系统，可用于控制对数据和API的访问。 ACL[基于功能的安全性](https://en.wikipedia.org/wiki/Capability-based_security)（ **基于功能的安全性**是[安全计算](https://en.wikipedia.org/wiki/Computer_security)系统（现有[安全模型](https://en.wikipedia.org/wiki/Computer_security_model)之一）的设计概念），它依赖于与策略关联的令牌来确定可以应用哪些细粒度的规则。 Consul基于功能的ACL系统与AWS IAM的设计非常相似。
-
 Consul提供了一个可选的访问控制列表（ACL）系统，可用于控制对数据和API的访问。ACL是[基于能力的](https://en.wikipedia.org/wiki/Capability-based_security)\(_系统的安全模型之一_\)，依靠与策略相关联的令牌来确定可以应用哪些细粒度的规则。Consul的基于能力的ACL系统与[AWS IAM](https://aws.amazon.com/iam/)的设计非常相似。
 
  要了解如何在现有Consul数据中心上设置ACL系统，请使[用Bootstrapping ACL System教程](https://learn.hashicorp.com/tutorials/consul/access-control-setup?utm_source=consul.io&utm_medium=docs)。
 
-要学习如何在现有的Consul数据中心上设置ACL系统，请使用[Bootstrapping The ACL系统教程](https://learn.hashicorp.com/tutorials/consul/access-control-setup?utm_source=consul.io&utm_medium=docs)。
-
-ACL系统的设计易于使用，并且可以快速执行，同时提供管理洞察力。 大体来说，ACL系统包含两个主要组件： 
-
 ## [»](acl-system.md#acl-system-overview)ACL系统概览
 
-ACL系统的设计是为了便于使用和快速执行，同时提供管理方面的见解。宏观来看，ACL系统有两个主要组成部分：
+ACL系统的设计是为了便于使用和快速执行，同时提供管理方面的能力。宏观来看，ACL系统有两个主要组成部分：
 
 * **ACL策略** -  策略允许将一组规则分组为一个逻辑单元，该逻辑单元可以重复使用并与许多令牌链接。
 * **ACL令牌** - 对Consul的请求是通过使用不记名令牌授权的。每个ACL令牌都有一个公共的Accessor ID，用来命名令牌，还有一个Secret ID，作为向Consul提出请求的不记名令牌。
@@ -42,12 +34,6 @@ ACL令牌、策略、角色、授权方法和绑定规则由Consul操作员通�
 * **Rules** - 授予或拒绝权限的一组规则。请参阅[规则规范文档](https://www.consul.io/docs/acl/acl-rules#rule-specification)了解更多详情。
 * **Datacenters** - 策略有效的数据中心列表。
 * **Namespace** - 企业版本，这个策略所在的命名空间。\(在Consul Enterprise 1.7.0中添加\)
-* **ID** - 策略的自动生成的公共标识符。 
-* **名称** - 策略的唯一有意义的名称。 
-* **描述** - 策略的可读性描述。\(可选\)-
-* **规则** - 授予或拒绝权限的一组规则。请参阅[规则规范文档](https://www.consul.io/docs/acl/acl-rules#rule-specification)了解更多详情。
-* **数据中心** - 策略有效的数据中心列表。
-* **命名空间** - Enterprise - 这个策略所在的命名空间。\(在Consul Enterprise 1.7.0中添加\)
 
 **Consul Enterprise 命名空间** - 策略中定义的规则在除缺省之外的任何命名空间中都将被限制为能够授予整体权限的一个子集，并且只影响该单一命名空间。 
 
@@ -62,7 +48,7 @@ ACL令牌、策略、角色、授权方法和绑定规则由Consul操作员通�
 
 Consul 1.5.0增加。
 
-ACL服务标识是一个[ACL策略](https://www.consul.io/docs/acl/acl-system#acl-policies)模板，用于表达适合在Consul Connect中使用的策略链接。它们既可用于令牌
+ACL服务标识是一个[ACL策略](https://www.consul.io/docs/acl/acl-system#acl-policies)模板，用于表达适合在Consul Connect中使用的策略链接。它们既可用于令牌。
 
 
 
