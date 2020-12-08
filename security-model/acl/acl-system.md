@@ -50,6 +50,62 @@ Consul 1.5.0增加。
 
 ACL服务标识是一个[ACL策略](https://www.consul.io/docs/acl/acl-system#acl-policies)模板，用于表达适合在Consul Connect中使用的策略链接。它们既可用于令牌。
 
+* **Service Name** - 服务名称
+* **Datacenters** - 策略有效的数据中心列表。 \(可选参数\)
+
+参与服务网格的服务将需要特权来发现， 并且发现其他健康的服务实例。合适的策略往往看起来都几乎相同，所以服务标识是一个策略模板，以帮助避免创建模板策略。
+
+在授权过程中，将使用以下预配置的ACL规则自动将配置的服务标识作为策略应用：
+
+```text
+# Allow the service and its sidecar proxy to register into the catalog.
+service "<Service Name>" {
+    policy = "write"
+}
+service "<Service Name>-sidecar-proxy" {
+    policy = "write"
+}
+
+# Allow for any potential upstreams to be resolved.
+service_prefix "" {
+    policy = "read"
+}
+node_prefix "" {
+    policy = "read"
+}
+```
+
+[这篇用于角色的API文档](https://www.consul.io/api/acl/roles#sample-payload)有一些身份标识的例子。 
+
+**Consul Enterprise Namespacing** - 服务标识规则的范围将限于相应ACL令牌或角色所在的单个命名空间。
+
+### **ACL 节点标识**
+
+在Consul 1.8.1中新增。
+
+ACL节点标识是[ACL策略](https://www.consul.io/docs/acl/acl-system#acl-policies)模板，用于表达指向适合用作Consul代理令牌的策略的链接。 它们在令牌和角色上均可用，并且由以下元素组成：
+
+* **Node Name** - 授权访问的节点名称
+* **Datacenter** - 节点所在的数据中心
+
+在授权过程中，配置的节点标识将自动应用为具有以下[预配置 ACL 规则策略](https://www.consul.io/docs/acl/acl-system#acl-rules-and-scope)：
+
+```text
+# Allow the agent to register its own node in the Catalog and update its network coordinates
+node "<Node Name>" {
+  policy = "write"
+}
+
+# Allows the agent to detect and diff services registered to itself. This is used during
+# anti-entropy to reconcile difference between the agents knowledge of registered
+# services and checks in comparison with what is known in the Catalog.
+service_prefix "" {
+  policy = "read"
+}
+```
+
+**Consul Enterprise Namespacing** -节点标识只能应用于默认名称空间中的令牌和角色。综合策略规则允许对所有名称空间中的所有服务赋予`service：read`权限。
+
 
 
 
