@@ -185,6 +185,71 @@ ACL策略未涵盖以下资源：
 
 **Consul Enterprise命名空间**-除了直接链接的策略，角色和服务标识之外，Consul Enterprise将包括在[Namespaces定义中定义](https://www.consul.io/docs/enterprise/namespaces#namespace-definition)的ACL策略和角色。（在Consul Enterprise 1.7.0中添加）
 
+### 配置ACL
+
+使用多个不同的配置选项配置ACL。这些配置是区分它们是在服务端，客户端还是两者上设置。
+
+| 配置选项 | Servers | Clients | 作用 |
+| :--- | :--- | :--- | :--- |
+| [`acl.enabled`](https://www.consul.io/docs/agent/options#acl_enabled) | `REQUIRED` | `REQUIRED` | 控制是否启用ACL |
+| [`acl.default_policy`](https://www.consul.io/docs/agent/options#acl_default_policy) | `OPTIONAL` | `N/A` | 确定允许列表或拒绝列表模式 |
+| [`acl.down_policy`](https://www.consul.io/docs/agent/options#acl_down_policy) | `OPTIONAL` | `OPTIONAL` | 确定在远程令牌或策略解析失败时该怎么办 |
+| [`acl.role_ttl`](https://www.consul.io/docs/agent/options#acl_role_ttl) | `OPTIONAL` | `OPTIONAL` | 确定缓存的ACL角色的生存时间 |
+| [`acl.policy_ttl`](https://www.consul.io/docs/agent/options#acl_policy_ttl) | `OPTIONAL` | `OPTIONAL` | 确定缓存的ACL策略的生存时间 |
+| [`acl.token_ttl`](https://www.consul.io/docs/agent/options#acl_token_ttl) | `OPTIONAL` | `OPTIONAL` | 确定缓存的ACL令牌的生存时间 |
+
+还可以配置许多特殊令牌，这些令牌允许启动ACL系统或在特殊情况下访问Consul：
+
+| 特殊令牌 | 伺服器 | 客户群 | 目的 |
+| :--- | :--- | :--- | :--- |
+| [`acl.tokens.agent_master`](https://www.consul.io/docs/agent/options#acl_tokens_agent_master) | `OPTIONAL` | `OPTIONAL` | 远程承载令牌解析失败时可用于访问[Agent API的](https://www.consul.io/api/agent)特殊令牌；用于设置集群（例如执行初始加入操作），请参阅“ [ACL代理主令牌”](https://www.consul.io/docs/security/acl/acl-system#acl-agent-master-token)部分以了解更多详细信息 |
+| [`acl.tokens.agent`](https://www.consul.io/docs/agent/options#acl_tokens_agent) | `OPTIONAL` | `OPTIONAL` | 用于代理程序内部操作的特殊令牌，有关更多详细信息，请参见“ [ACL代理程序令牌”](https://www.consul.io/docs/security/acl/acl-system#acl-agent-token)部分 |
+| [`acl.tokens.master`](https://www.consul.io/docs/agent/options#acl_tokens_master) | `OPTIONAL` | `N/A` | 用于启动ACL系统的特殊令牌，请查看[Bootstrapping ACL](https://learn.hashicorp.com/tutorials/consul/access-control-setup-production)教程以获取更多详细信息 |
+| [`acl.tokens.default`](https://www.consul.io/docs/agent/options#acl_tokens_default) | `OPTIONAL` | `OPTIONAL` | 在没有提供令牌的情况下用于客户端请求的默认令牌；通常将其配置为具有对服务的只读访问权限，以在代理上启用DNS服务发现 |
+
+除令牌外，所有这些令牌`master`都可以通过[/v1/agent/token API](https://www.consul.io/api/agent#update-acl-tokens)引入或更新。
+
+**ACL Agent Master Tokern**
+
+由于[`acl.tokens.agent_master`](https://www.consul.io/docs/agent/options#acl_tokens_agent_master)旨在在Consul服务器不可用时使用，因此，其策略是在代理上本地管理的，不需要通过ACL API在Consul服务器上定义令牌。设置后，它暗中具有与之关联的以下策略
+
+```text
+agent "<node name of agent>" {
+  policy = "write"
+}
+node_prefix "" {
+  policy = "read"
+}
+```
+
+**ACL Agent Token**
+
+该[`acl.tokens.agent`](https://www.consul.io/docs/agent/options#acl_tokens_agent)是用于代理的内部操作的特殊标记。它不会直接用于任何用户启动的操作（例如）[`acl.tokens.default`](https://www.consul.io/docs/agent/options#acl_tokens_default)，但是如果`acl.tokens.agent_token`未配置，`acl.tokens.default`则会使用。ACL代理令牌由代理用于以下操作：
+
+1. 使用[目录API](https://www.consul.io/api/catalog)更新代理的节点条目，包括更新其节点元数据，标记的地址和网络坐标
+2. 执行[反熵](https://www.consul.io/docs/internals/anti-entropy)同步，尤其是读取在目录中注册的节点元数据和服务
+3. `_rexec`执行[`consul exec`](https://www.consul.io/commands/exec)命令时读写KV存储区的特殊部分
+
+这是一个示例策略，足以对称为的节点完成上述操作`mynode`：
+
+```text
+node "mynode" {
+  policy = "write"
+}
+service_prefix "" {
+  policy = "read"
+}
+key_prefix "_rexec" {
+  policy = "write"
+}
+```
+
+该`service_prefix`策略需要可以在代理上注册的任何服务的读取访问权限。如果将[remote exec禁用](https://www.consul.io/docs/agent/options#disable_remote_exec)为默认值，则`key_prefix`可以省略该策略。
+
+### [»](https://www.consul.io/docs/security/acl/acl-system#next-steps)下一步
+
+使用[Bootstrapping ACL System教程](https://learn.hashicorp.com/tutorials/consul/access-control-setup-production?utm_source=consul.io&utm_medium=docs)设置ACL或继续阅读有关 [ACL规则的信息](https://www.consul.io/docs/acl/acl-rules)。
+
 
 
 
