@@ -6,7 +6,7 @@ Consul提供了一个可选的访问控制列表（ACL）系统，可用于控�
 
  要了解如何在现有Consul数据中心上设置ACL系统，请使[用Bootstrapping ACL System教程](https://learn.hashicorp.com/tutorials/consul/access-control-setup?utm_source=consul.io&utm_medium=docs)。
 
-## [»](acl-system.md#acl-system-overview)ACL系统概览
+## ACL系统概览
 
 ACL系统的设计是为了便于使用和快速执行，同时提供管理方面的能力。宏观来看，ACL系统有两个主要组成部分：
 
@@ -24,7 +24,7 @@ ACL令牌、策略、角色、授权方法和绑定规则由Consul操作员通�
 
 如果ACL系统无法使用，您可以在任何时候遵循[重置程序](https://learn.hashicorp.com/tutorials/consul/access-control-troubleshoot#reset-the-acl-system)。
 
-### [»](acl-system.md#acl-policies)ACL 策略
+### ACL 策略
 
 一个ACL策略是一个命名的规则集，由以下元素组成。 
 
@@ -37,14 +37,14 @@ ACL令牌、策略、角色、授权方法和绑定规则由Consul操作员通�
 
 **Consul Enterprise 命名空间** - 策略中定义的规则在除缺省之外的任何命名空间中都将被限制为能够授予整体权限的一个子集，并且只影响该单一命名空间。 
 
-#### [»](acl-system.md#builtin-policies)内置策略
+#### 内置策略
 
 * **全局管理** - 授予任何使用它的令牌不受限制的权限。创建时，它将被命名为 `global-management`，并将被分配保留的 ID `00000000-0000-0000-0000-0000-00000001`。该策略可以重新命名，但其他任何东西的修改，包括规则集和数据中心范围，都将被Consul阻止。
 * 命名空间管理 -
 
   （**企业版本**） - 每个创建的命名空间都会有一个策略，注入名称为_namespace-management_。这个策略会被注入一个随机的UUID，并且可以像其他用户定义的策略一样在命名空间中进行管理。\(在Consul Enterprise 1.7.0中添加\)
 
-### [»](acl-system.md#acl-service-identities)ACL服务标识
+### ACL服务标识
 
 Consul 1.5.0增加。
 
@@ -105,8 +105,6 @@ service_prefix "" {
 ```
 
 **Consul Enterprise Namespacing** -节点标识只能应用于默认名称空间中的令牌和角色。综合策略规则允许对所有名称空间中的所有服务赋予`service：read`权限。
-
-
 
 #### ACL角色
 
@@ -246,7 +244,7 @@ key_prefix "_rexec" {
 
 该`service_prefix`策略需要可以在代理上注册的任何服务的读取访问权限。如果将[remote exec禁用](https://www.consul.io/docs/agent/options#disable_remote_exec)为默认值，则`key_prefix`可以省略该策略。
 
-### [»](https://www.consul.io/docs/security/acl/acl-system#next-steps)下一步
+### 下一步
 
 使用[Bootstrapping ACL System教程](https://learn.hashicorp.com/tutorials/consul/access-control-setup-production?utm_source=consul.io&utm_medium=docs)设置ACL或继续阅读有关 [ACL规则的信息](https://www.consul.io/docs/acl/acl-rules)。
 
