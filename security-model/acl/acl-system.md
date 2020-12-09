@@ -145,15 +145,45 @@ ACL令牌被用于判断调用者是否有权执行响应的操作。 一个ACL�
 
 在集群启动期间，当启用ACL时，特殊的`anonymous`\(匿名\)和 `master`\(主\) 令牌都将被注入。
 
-* **Anonymous Token** - The anonymous token is used when a request is made to Consul without specifying a bearer token. The anonymous token's description and policies may be updated but Consul will prevent this token's deletion. When created, it will be assigned `00000000-0000-0000-0000-000000000002` for its Accessor ID and `anonymous` for its Secret ID.
 * 匿名令牌 - 当向Consul发出请求而未指定承载令牌时，将使用匿名令牌。匿名令牌的描述和策略可能会更新，但是Consul将阻止该令牌的删除。创建后，`00000000-0000-0000-0000-000000000002`将作为匿名令牌的 Accessor ID，`anonymous` 作为Secret ID。
-* **Master Token** -  When a master token is present within the Consul configuration, it is created and will be linked With the builtin Global Management policy giving it unrestricted privileges. The master token is created with the Secret ID set to the value of the configuration entry.
+* 主令牌 -  当Consul配置中存在主令牌时，将创建该主令牌并将其与内置的全局管理策略链接，从而赋予其不受限制的特权。创建主令牌时，会将Secret ID设置为配置条目的值。
 
-**»Authorization**
+**授权**
 
-The token Secret ID is passed along with each RPC request to the servers. Consul's [HTTP endpoints](https://www.consul.io/api) can accept tokens via the `token` query string parameter, the `X-Consul-Token` request header, or an [RFC6750](https://tools.ietf.org/html/rfc6750) authorization bearer token. Consul's [CLI commands](https://www.consul.io/docs/commands) can accept tokens via the `token` argument, or the `CONSUL_HTTP_TOKEN` environment variable. The CLI commands can also accept token values stored in files with the `token-file` argument, or the `CONSUL_HTTP_TOKEN_FILE` environment variable.
+令牌秘密ID与每个RPC请求一起传递到服务器。 Consul的[HTTP端点](https://www.consul.io/api)可以通过令牌查询字符串参数，`X-Consul-Token`请求Header或[RFC6750](https://tools.ietf.org/html/rfc6750)授权承载令牌接受令牌。 Consul的[CLI命令](https://www.consul.io/docs/commands)可以通过`token`参数或`CONSUL_HTTP_TOKEN`环境变量接受令牌。 CLI命令还可以接受带有`token-file`参数或`CONSUL_HTTP_TOKEN_FILE`环境变量的文件中存储的令牌值。
 
-If no token is provided for an HTTP request then Consul will use the default ACL token if it has been configured. If no default ACL token was configured then the anonymous token will be used.
+如果没有为HTTP请求提供令牌，那么Consul将使用默认的ACL令牌（如果已配置）。如果未配置默认ACL令牌
+
+**ACL规则和范围** 
+
+来自与令牌关联的所有**策略**、**角色**和**服务标识**的规则被合并以形成该令牌的有效规则集。根据[`acl_default_policy`](https://www.consul.io/docs/agent/options#acl_default_policy)的配置, 策略规则可以定义成**允许**列表或**拒绝**列表模式。如果默认策略是“拒绝”访问所有资源，则可以将策略规则设置为允许列表访问特定资源。相反，如果默认策略为“允许”，则可以使用策略规则显式拒绝对资源的访问。
+
+下表总结了可用于构造规则的ACL资源：
+
+| 资源资源 | 范围 |
+| :--- | :--- |
+| [`acl`](https://www.consul.io/docs/acl/acl-rules#acl-resource-rules) | 管理ACL系统[ACL API的操作](https://www.consul.io/api/acl/acl) |
+| [`agent`](https://www.consul.io/docs/acl/acl-rules#agent-rules) | [代理API](https://www.consul.io/api/agent)中的实用程序操作（服务和检查注册除外） |
+| [`event`](https://www.consul.io/docs/acl/acl-rules#event-rules) | 列出和触发[事件API](https://www.consul.io/api/event)中的[事件](https://www.consul.io/api/event) |
+| [`key`](https://www.consul.io/docs/acl/acl-rules#key-value-rules) | [KV Store API](https://www.consul.io/api/kv)中的键/值存储操作 |
+| [`keyring`](https://www.consul.io/docs/acl/acl-rules#keyring-rules) | [Keyring API](https://www.consul.io/api/operator/keyring)中的[密钥环](https://www.consul.io/api/operator/keyring)操作 |
+| [`node`](https://www.consul.io/docs/acl/acl-rules#node-rules) | [Catalog API](https://www.consul.io/api/catalog)，[Health API](https://www.consul.io/api/health)，[Prepared Query API](https://www.consul.io/api/query)，[Network Coordinate API](https://www.consul.io/api/coordinate)和[Agent API中的](https://www.consul.io/api/agent)节点级目录操作 |
+| [`operator`](https://www.consul.io/docs/acl/acl-rules#operator-rules) | 除了[Keyring API](https://www.consul.io/api/operator/keyring)之外，[Operator API](https://www.consul.io/api/operator)中的集群级操作 |
+| [`query`](https://www.consul.io/docs/acl/acl-rules#prepared-query-rules) | 准备查询[API](https://www.consul.io/api/query)中的[准备](https://www.consul.io/api/query)查询操作 |
+| [`service`](https://www.consul.io/docs/acl/acl-rules#service-rules) | [Catalog API](https://www.consul.io/api/catalog)，[Health API](https://www.consul.io/api/health)，[Prepared Query API](https://www.consul.io/api/query)和[Agent API中的](https://www.consul.io/api/agent)服务级别目录操作 |
+| [`session`](https://www.consul.io/docs/acl/acl-rules#session-rules) | [会话API](https://www.consul.io/api/session)中的[会话](https://www.consul.io/api/session)操作 |
+
+由于Consul快照实际上包含ACL令牌，因此[Snapshot API](https://www.consul.io/api/snapshot) 要求ACL系统具有“写”特权的令牌。
+
+ACL策略未涵盖以下资源：
+
+1. 该[状态API](https://www.consul.io/api/status)所使用的服务器，正在启动并公开基本IP以及有关服务器端口信息时，不允许任何状态的修改。
+2. [Catalog API](https://www.consul.io/api/catalog#list-datacenters)的数据中心列表操作，  类似查询已知Consul数据中心的名称，不允许修改任何状态。
+3. 该[Connect CA roo](https://www.consul.io/api/connect/ca#list-ca-root-certificates)[ts endpoint](https://www.consul.io/api/connect/ca#list-ca-root-certificates)仅公开了其他系统可以使用它来验证与Consul TLS连接公共TLS证书。
+
+在“ [ACL规则”](https://www.consul.io/docs/acl/acl-rules)页面上详细介绍了根据这些策略构造规则 。
+
+**Consul Enterprise命名空间**-除了直接链接的策略，角色和服务标识之外，Consul Enterprise将包括在[Namespaces定义中定义](https://www.consul.io/docs/enterprise/namespaces#namespace-definition)的ACL策略和角色。（在Consul Enterprise 1.7.0中添加）
 
 
 
