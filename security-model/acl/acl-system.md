@@ -143,10 +143,11 @@ ACL令牌被用于判断调用者是否有权执行响应的操作。 一个ACL�
 
 **内置令牌**
 
-During cluster bootstrapping when ACLs are enabled both the special `anonymous` and the `master` token will be injected.
+在集群启动期间，当启用ACL时，特殊的`anonymous`\(匿名\)和 `master`\(主\) 令牌都将被注入。
 
 * **Anonymous Token** - The anonymous token is used when a request is made to Consul without specifying a bearer token. The anonymous token's description and policies may be updated but Consul will prevent this token's deletion. When created, it will be assigned `00000000-0000-0000-0000-000000000002` for its Accessor ID and `anonymous` for its Secret ID.
-* **Master Token** - When a master token is present within the Consul configuration, it is created and will be linked With the builtin Global Management policy giving it unrestricted privileges. The master token is created with the Secret ID set to the value of the configuration entry.
+* 匿名令牌 - 当向Consul发出请求而未指定承载令牌时，将使用匿名令牌。匿名令牌的描述和策略可能会更新，但是Consul将阻止该令牌的删除。创建后，`00000000-0000-0000-0000-000000000002`将作为匿名令牌的 Accessor ID，`anonymous` 作为Secret ID。
+* **Master Token** -  When a master token is present within the Consul configuration, it is created and will be linked With the builtin Global Management policy giving it unrestricted privileges. The master token is created with the Secret ID set to the value of the configuration entry.
 
 **»Authorization**
 
