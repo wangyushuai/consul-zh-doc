@@ -108,6 +108,54 @@ service_prefix "" {
 
 
 
+#### ACL角色
+
+Consul 1.5.0 增加
+
+An ACL role is a named set of policies and service identities and is composed of the following elements:
+
+一个ACL角色是一组命名的策略和服务标识，由以下元素组成：
+
+* **ID** - 角色自动生成的公共标识符
+* **Name** - 角色的**唯一**有意义的名称
+* **Description** - 对角色可读描述. \(可选\)
+* **Policy Set** - 角色包含策略列表
+* **Service Identity Set** - 角色包含的服务标识.
+* **Namespace** ENTERPRISE -  策略所在的命名空间 \(Consul 企业版本 1.7.0增加\)
+
+**Consul Enterprise Namespacing** - 角色只能链接到在与角色本身相同的名称空间中定义的策略。
+
+#### ACL 令牌
+
+ACL令牌被用于判断调用者是否有权执行响应的操作。 一个ACL令牌由以下元素组成：
+
+* **Accessor ID** - 令牌公共的身份标识；
+* **Secret ID** - 请求Consul时不记名令牌；
+* **Description** - 可读的不记名令牌描述；\(可选\)
+* **Policy Set** - 令牌适用的策略集合；
+* **Role Set** - 令牌适用的角色列表；（Consul 1.5.0增加\)
+* **Service Identity Set** -  令牌适用的服务标识集合. \(Consul 1.5.0增加\)
+* **Locality** - 令牌是在本地数据中心内创建的，还是在主数据中心创建并全局复制的。
+* **Expiration Time** - Token失效时间 \(可选; Consul 1.5.0增加\)
+* **Namespace** ENTERPRISE - The namespace this policy resides within. \(Added in Consul Enterprise 1.7.0\)
+
+**Consul Enterprise Namespacing** - 令牌只能链接到在与临牌本身相同的名称空间中定义的策略和角色。
+
+**内置令牌**
+
+During cluster bootstrapping when ACLs are enabled both the special `anonymous` and the `master` token will be injected.
+
+* **Anonymous Token** - The anonymous token is used when a request is made to Consul without specifying a bearer token. The anonymous token's description and policies may be updated but Consul will prevent this token's deletion. When created, it will be assigned `00000000-0000-0000-0000-000000000002` for its Accessor ID and `anonymous` for its Secret ID.
+* **Master Token** - When a master token is present within the Consul configuration, it is created and will be linked With the builtin Global Management policy giving it unrestricted privileges. The master token is created with the Secret ID set to the value of the configuration entry.
+
+**»Authorization**
+
+The token Secret ID is passed along with each RPC request to the servers. Consul's [HTTP endpoints](https://www.consul.io/api) can accept tokens via the `token` query string parameter, the `X-Consul-Token` request header, or an [RFC6750](https://tools.ietf.org/html/rfc6750) authorization bearer token. Consul's [CLI commands](https://www.consul.io/docs/commands) can accept tokens via the `token` argument, or the `CONSUL_HTTP_TOKEN` environment variable. The CLI commands can also accept token values stored in files with the `token-file` argument, or the `CONSUL_HTTP_TOKEN_FILE` environment variable.
+
+If no token is provided for an HTTP request then Consul will use the default ACL token if it has been configured. If no default ACL token was configured then the anonymous token will be used.
+
+
+
 
 
 
