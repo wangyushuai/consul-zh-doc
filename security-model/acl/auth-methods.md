@@ -54,7 +54,7 @@ Auth方法是Consul中的一个组件，该组件通过受信任的外部方执�
 
 ## [»]()绑定规则
 
-绑定规则运维人员设定的一种系统化的方式，自动关联[角色](https://www.consul.io/docs/acl/acl-system#acl-roles)和[服务标](https://www.consul.io/docs/acl/acl-system#acl-service-identities)去创建新的令牌，而无需运维人员干预。 
+绑定规则运维人员设定的一种系统化的方式，自动关联[角色](https://www.consul.io/docs/acl/acl-system#acl-roles)和[服务标识](https://www.consul.io/docs/acl/acl-system#acl-service-identities)去创建新的令牌，而无需运维人员干预。 
 
 通过**auth method** 身份验证成功将返回一组与已验证身份相对应的可信标识属性。返回的属性将与 auth method 设置的全量规则列表进行匹配， 确定最后应授予的权限，最后创建相应的令牌。 
 
