@@ -22,7 +22,7 @@
 * [Consul安全模型](security-model/README.md)
   * [访问控制（ACLs）](security-model/acl/README.md)
     * [ACL系统](security-model/acl/acl-system.md)
-    * [鉴权方法](security-model/acl/auth-methods.md)
+    * [ACL Auth Methods组件](security-model/acl/auth-methods.md)
   * [加密](security-model/consul-by-hashicorp-1.md)
 * [服务网格](connect.md)
 * [开始使用](start/README.md)
